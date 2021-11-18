@@ -8,7 +8,6 @@ class User(models.Model) :
     mbti = models.CharField(max_length=4, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
     class Meta:
         db_table = 'users'
-
-
