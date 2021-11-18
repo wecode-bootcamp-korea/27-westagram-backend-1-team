@@ -1,0 +1,13 @@
+SECRET_KEY = 'secret_key of settings.py'
+
+DATABASES = {
+    'default': {
+        'ENGINE'   : 'django.db.backends.mysql',
+        'NAME'     : 'name of database',
+        'USER'     : 'name of user(root)',
+        'PASSWORD' : 'password of database user',
+        'HOST'     : 'host of database(localhost)',
+        'PORT'     : 'port of database(3306)',
+        'OPTIONS'  : {'charset': 'utf8mb4'},
+    }
+}
