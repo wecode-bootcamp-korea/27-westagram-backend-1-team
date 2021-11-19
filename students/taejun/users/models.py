@@ -5,8 +5,8 @@ class User(models.Model):
     email      = models.CharField(max_length=254, unique=True)
     password   = models.CharField(max_length=200)
     contact    = models.CharField(max_length=11, unique=True)
-    mbti       = models.CharField(max_length=4, null=True)
-    gender     = models.CharField(max_length=1, default='U')
+    mbti       = models.CharField(max_length=4, null=True, blank=True)
+    gender     = models.CharField(max_length=9, default='Undefined')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
