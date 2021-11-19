@@ -16,8 +16,8 @@ class SignupView(View):
             email    = data['email']
             password = data['password']
             contact  = data['contact']
-            mbti     = data['mbti']   if 'mbti'   in data else None
-            gender   = data['gender'] if 'gender' in data else 'Undefined'
+            mbti     = data.get('mbti')
+            gender   = data.get('gender', 'Undefined')
 
             email_regex    = '^[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*@[a-zA-Z0-9]([-_.]?[a-zA-Z0-9])*\.[a-zA-Z]{2,3}$'
             password_regex = '''^.*(?=.*[a-zA-Z])(?=.*\d)(?=.*[!"#$%&'()*+,\-./:;<=>?@[＼\]^_`{|}~\\)])[\w!"#$%&'()*+,\-./:;<=>?@[＼\]^`{|}~\\)]{8,45}$'''
