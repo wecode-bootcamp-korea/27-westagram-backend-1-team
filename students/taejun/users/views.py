@@ -26,11 +26,11 @@ class SignupView(View):
             gender_list = ['Male', 'Female', 'Undefined']
 
             if re.match(email_regex, email) is None:
-                raise ValueError
+                return JsonResponse({'message': 'INVALID_EMAIL'}, status=400)
             if re.match(password_regex, password) is None:
-                raise ValueError
+                return JsonResponse({'message': 'INVALID_PASSWORD'}, status=400)
             if re.match(contact_regex, contact) is None:
-                raise ValueError
+                return JsonResponse({'message': 'INVALID_CONTACT'}, status=400)
             if mbti and not re.match(mbti_regex, mbti):
                 mbti = None
             if gender not in gender_list:
