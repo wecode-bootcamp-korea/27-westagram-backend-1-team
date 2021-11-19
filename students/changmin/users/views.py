@@ -13,21 +13,15 @@ class UserView(View):
         try:
             if data['email'] == '' or data['password'] == '':
                 return JsonResponse({'message':'Expected any words in Box'}, status = 400)
-
-            elif data['email'] in [i.email for i in User.objects.all()]:
-                raise JsonResponse({'message' : 'Duplicated Email address'}, status=400)
-
             elif re.match(regex_email, data['email']) is None or re.match(regex_password, data['password']) is None:
                 raise ValueError
-
         except ValueError:
             return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
-            
         else:
             User.objects.create(
                 name        = data['name'],
                 email       = data['email'],
                 password    = data['password'],
-                phone     = data['phone'],
+                phone       = data['phone']
             )
             return JsonResponse({'message':'SUCESS'},status=201)
