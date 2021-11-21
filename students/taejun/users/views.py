@@ -1,11 +1,12 @@
 import json, re
 
-import bcrypt
+import bcrypt, jwt
 from django.views import View
 from django.http  import JsonResponse
 from django.core.exceptions import ValidationError
 
 from users.models import User
+from my_settings  import SECRET_KEY, ALGORITHM
 
 class SignupView(View):
 
@@ -75,7 +76,12 @@ class SigninView(View):
                     user.password.encode('utf-8')
             ):
                 raise User.DoesNotExist
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            access_token = jwt.encode(
+                {'user-id': user.id},
+                SECRET_KEY,
+                algorithm=ALGORITHM
+            )
+            return JsonResponse({'access_token': access_token}, status=200)
 
         except User.DoesNotExist:
             return JsonResponse({'message': 'INVALID_USER'}, status=401)
