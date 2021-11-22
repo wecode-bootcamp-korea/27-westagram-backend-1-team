@@ -1,7 +1,7 @@
 import json, re
 
-from django.views import View
-from django.http  import JsonResponse
+from django.views           import View
+from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 
 from users.models import User
