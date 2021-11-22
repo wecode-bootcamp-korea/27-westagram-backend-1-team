@@ -1,8 +1,11 @@
 import json, re
 
-from django.views     import View
-from django.http      import JsonResponse
-from users.models     import User
+from django.views           import View
+from django.http            import JsonResponse
+from django.db              import IntegrityError
+from django.core.exceptions import ValidationError
+
+from users.models           import User
 
 class UserView(View):
      def post(self, request):
@@ -11,8 +14,12 @@ class UserView(View):
         regex_password = '(?=.*[A-Za-z])(?=.*\d)(?=.*[~!@#$^&*()+|=])[A-Za-z\d~!@#$%^&*()+|=]{8,}'
 
         try:
-            if data['email'] == '' or data['password'] == '':
-                raise ValueError
+            if data['email'] == '':
+                return JsonResponse({'message' : 'EMAIL_KEY_ERROR'}, status=400)
+            elif data['password'] == '':
+                raise ValidationError(
+                    "Please enter a password of at least 8 digits"
+                )
             elif re.match(regex_email, data['email']) is None or re.match(regex_password, data['password']) is None:
                 return JsonResponse({'message':'Email or Password is not correct'}, status = 400)
             user_create = User.objects.create(
@@ -23,6 +30,6 @@ class UserView(View):
             )
             User.full_clean(user_create)
             User.save(user_create)
-            return JsonResponse({'message':'SUCESS'},status=201)
-        except ValueError:
-            return JsonResponse({'message' : 'KEY_ERROR'}, status=400)
+            return JsonResponse({'message':'SUCCESS'},status=201) 
+        except IntegrityError:
+            return JsonResponse({'message':'Duplicated Email exists'},status=201)
