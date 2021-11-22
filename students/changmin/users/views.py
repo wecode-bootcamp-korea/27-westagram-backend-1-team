@@ -39,3 +39,22 @@ class SignUpView(View):
         
         except IntegrityError:
             return JsonResponse({'message':'Duplicated Email exists'}, status=401)
+
+class SignInView(View):
+
+    def post(self, request):
+        data     = json.loads(request.body)
+        email    = data['email']
+        password = data['password']
+
+        try:
+            if data['email'] == '' or data['password'] == '':
+                return JsonResponse({'message':'KEY_ERROR'}, status=400)
+
+            if not User.objects.filter(email=email).exists() and User.objects.filter(password=password).exists():
+                return JsonResponse({'message':'INVALID_USER'}, status=401)
+
+            return JsonResponse({'message':'SUCCESS'}, status=200)
+
+        except ValidationError:
+        	("Please enter a password of at least 8 digits")
