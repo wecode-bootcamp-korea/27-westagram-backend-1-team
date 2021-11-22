@@ -8,32 +8,32 @@ from django.core.exceptions import ValidationError
 from users.models           import User
 
 class SignUpView(View):
-     def post(self, request):
+    REGEX_EMAIL    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    REGEX_PASSWORD = '^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
+
+    def post(self, request):
         data           = json.loads(request.body)
-        regex_email    = '[a-zA-Z0-9]+\.?\w*@\w+[.]?\w*[.]+\w{2,3}'
-        regex_password = '(?=.*[A-Za-z])(?=.*\d)(?=.*[~!@#$^&*()+|=])[A-Za-z\d~!@#$%^&*()+|=]{8,}'
+        user_name      = data['name']
+        user_email     = data['email']
+        user_password  = data['password']
+        user_phone     = data['phone']
 
         try:
-            if data['email'] == '':
+            if not re.match(self.REGEX_EMAIL, user_email) or user_email == '':
                 return JsonResponse({'message' : 'EMAIL_KEY_ERROR'}, status=400)
-        
-            if data['password'] == '':
-                raise ValidationError(
-                    "Please enter a password of at least 8 digits"
-                )
-        
-            if re.match(regex_email, data['email']) is None or re.match(regex_password, data['password']) is None:
-                return JsonResponse({'message':'Email or Password is not correct'}, status=400)
+
+            if not re.match(self.REGEX_PASSWORD, user_password) or user_password == '':
+                raise ValidationError('PASSWORD_KEY_ERROR')
             
-            user_create = User.objects.create(
-                name        = data['name'],
-                email       = data['email'],
-                password    = data['password'],
-                phone       = data['phone']
+            user_create = User(
+                name        = user_name,
+                email       = user_email,
+                password    = user_password,
+                phone       = user_phone,
             )
-            
-            User.full_clean(user_create)
-            User.save(user_create)
+
+            user_create.full_clean()
+            user_create.save()
         
             return JsonResponse({'message':'SUCCESS'}, status=201) 
         
