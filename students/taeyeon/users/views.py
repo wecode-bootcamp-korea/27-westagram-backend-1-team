@@ -2,7 +2,7 @@ import json,re
 
 from django.http  import JsonResponse
 from django.views import View
-from django.db    import IntegrityError
+
 from .models      import User
 
 class UsersView(View) :
@@ -33,9 +33,7 @@ class UsersView(View) :
                 mbti     = data['mbti']
                 )
             
-        except IntegrityError :
-            return JsonResponse({"message": "Email already exist"}, status=400)   
-               
+  
         except KeyError : 
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)   
         
