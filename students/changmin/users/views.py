@@ -16,10 +16,12 @@ class SignUpView(View):
         try:
             if data['email'] == '':
                 return JsonResponse({'message' : 'EMAIL_KEY_ERROR'}, status=400)
+        
             if data['password'] == '':
                 raise ValidationError(
                     "Please enter a password of at least 8 digits"
                 )
+        
             if re.match(regex_email, data['email']) is None or re.match(regex_password, data['password']) is None:
                 return JsonResponse({'message':'Email or Password is not correct'}, status=400)
             
@@ -29,8 +31,10 @@ class SignUpView(View):
                 password    = data['password'],
                 phone       = data['phone']
             )
+            
             User.full_clean(user_create)
             User.save(user_create)
+        
             return JsonResponse({'message':'SUCCESS'}, status=201) 
         
         except IntegrityError:
