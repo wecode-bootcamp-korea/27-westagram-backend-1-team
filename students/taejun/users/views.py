@@ -19,15 +19,13 @@ class SignupView(View):
             mbti     = data.get('mbti', '')
             gender   = data.get('gender', 'Undefined')
 
-            validation_result = validation(
+            validation(
                 email,
                 password,
                 contact,
                 mbti,
                 gender
             )
-            if validation_result is not None:
-                return JsonResponse({'message': validation_result}, status=400)
 
             user = User(
                 name     = name,
@@ -44,8 +42,28 @@ class SignupView(View):
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
-        except ValidationError:
-            return JsonResponse({'message': 'VALIDATION_ERROR'}, status=400)
+        except ValidationError as e:
+            if 'message' in e.__dict__:
+                return JsonResponse({'message': e.message}, status=400)
+
+            e = e.error_dict
+
+            if 'email' in e:
+                msg = 'INVALID_EMAIL'
+            elif 'name' in e:
+                msg = 'INVALID_NAME'
+            elif 'password' in e:
+                msg = 'INVALID_PASSWORD'
+            elif 'contact' in e:
+                msg = 'INVALID_CONTACT'
+            elif 'mbti' in e:
+                msg = 'INVALID_MBTI'
+            elif 'gender' in e:
+                msg = 'INVALID_GENDER'
+            else:
+                msg = 'VALIDATION_ERROR'
+
+            return JsonResponse({'message': msg}, status=400)
 
         return JsonResponse({'message': 'CREATED'}, status=201)
 
