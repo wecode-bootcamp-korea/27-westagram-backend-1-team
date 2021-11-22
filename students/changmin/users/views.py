@@ -21,7 +21,7 @@ class UserView(View):
                     "Please enter a password of at least 8 digits"
                 )
             elif re.match(regex_email, data['email']) is None or re.match(regex_password, data['password']) is None:
-                return JsonResponse({'message':'Email or Password is not correct'}, status = 400)
+                return JsonResponse({'message':'Email or Password is not correct'}, status=400)
             user_create = User.objects.create(
                 name        = data['name'],
                 email       = data['email'],
@@ -30,6 +30,6 @@ class UserView(View):
             )
             User.full_clean(user_create)
             User.save(user_create)
-            return JsonResponse({'message':'SUCCESS'},status=201) 
+            return JsonResponse({'message':'SUCCESS'}, status=201) 
         except IntegrityError:
-            return JsonResponse({'message':'Duplicated Email exists'},status=201)
+            return JsonResponse({'message':'Duplicated Email exists'}, status=401)
