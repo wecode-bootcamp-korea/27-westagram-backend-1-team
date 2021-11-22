@@ -21,7 +21,7 @@ class UsersView(View) :
                 return JsonResponse({"message" : "Password format is incorrect"}, status=400)
 
             
-            if User.objects.filter(email=email).create :
+            if User.objects.filter(email=email).exists :
                 return JsonResponse({"message": "Email already exist"}, status=400)   
             
 
