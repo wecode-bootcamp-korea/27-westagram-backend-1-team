@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 
 from .models                import User
 
-class UsersView(View) :
+class SignUpView(View) :
     REGEX_EMAIL    = r'^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     REGEX_PASSWORD = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
     
