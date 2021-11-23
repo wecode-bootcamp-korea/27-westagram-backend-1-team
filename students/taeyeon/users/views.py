@@ -4,7 +4,7 @@ from django.http            import JsonResponse
 from django.views           import View
 from django.core.exceptions import ValidationError
 
-from .validation            import Validation
+from .validation            import Validation_email, Validation_password
 from .models                import User
 
 class SignUpView(View) :
@@ -15,7 +15,8 @@ class SignUpView(View) :
             email          = data['email']
             password       = data['password']
             
-            Validation(email,password)
+            Validation_email(email)
+            Validation_password(password)
 
             User.objects.create(
                 name     = data['name'],
