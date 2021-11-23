@@ -1,4 +1,4 @@
-import json, re
+import json
 
 from django.views           import View
 from django.http            import JsonResponse
@@ -6,24 +6,17 @@ from django.db              import IntegrityError
 from django.core.exceptions import ValidationError
 
 from users.models           import User
+from users.validation       import validate_check
 
 class SignUpView(View):
-    REGEX_EMAIL    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    REGEX_PASSWORD = '^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
-
     def post(self, request):
-        data           = json.loads(request.body)
-        user_name      = data['name']
-        user_email     = data['email']
-        user_password  = data['password']
-        user_phone     = data['phone']
 
         try:
-            if not re.match(self.REGEX_EMAIL, user_email) or user_email == '':
-                return JsonResponse({'message' : 'EMAIL_KEY_ERROR'}, status=400)
-
-            if not re.match(self.REGEX_PASSWORD, user_password) or user_password == '':
-                raise ValidationError('PASSWORD_KEY_ERROR')
+            data           = json.loads(request.body)
+            user_name      = data['name']
+            user_email     = data['email']
+            user_password  = data['password']
+            user_phone     = data['phone']
             
             user_create = User(
                 name        = user_name,
@@ -32,29 +25,40 @@ class SignUpView(View):
                 phone       = user_phone,
             )
 
+            validate_check(
+                user_email,
+                user_password,
+            )
+
             user_create.full_clean()
             user_create.save()
         
-            return JsonResponse({'message':'SUCCESS'}, status=201) 
-        
+            return JsonResponse({'message':'SUCCESS'}, status=201)
+
         except IntegrityError:
             return JsonResponse({'message':'Duplicated Email exists'}, status=401)
 
-class SignInView(View):
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
+        except ValidationError: 
+            return JsonResponse({'message':'Validation Error'}, status=400)
+
+class SignInView(View):
     def post(self, request):
-        data     = json.loads(request.body)
-        email    = data['email']
-        password = data['password']
 
         try:
-            if data['email'] == '' or data['password'] == '':
-                return JsonResponse({'message':'KEY_ERROR'}, status=400)
+            data     = json.loads(request.body)
+            user_email    = data['email']
+            user_password = data['password']
 
-            if not User.objects.filter(email=email).exists() and User.objects.filter(password=password).exists():
+            if user_email == '' or user_password == '':
+                return JsonResponse({'message':'Email or Password must be entered'}, status=401)
+
+            if not User.objects.filter(email=user_email, password=user_password).exists():
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
 
             return JsonResponse({'message':'SUCCESS'}, status=200)
 
-        except ValidationError:
-        	("Please enter a password of at least 8 digits")
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
