@@ -52,7 +52,7 @@ class SignInView(View):
             email        = data['email']
             password     = data['password']
 
-            if email == "" or password == "":
+            if email == "" or password =="":
                 return JsonResponse({"message": "Email or Password field is blanked."}, status=401)
             if not User.objects.filter(email=email, password=password).exists():
                 return JsonResponse({"message": "INVALID_USER"}, status=401)
