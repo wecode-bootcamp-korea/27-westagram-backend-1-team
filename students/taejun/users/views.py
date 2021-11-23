@@ -1,11 +1,11 @@
-import json, re
+import json
 
 from django.views           import View
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 
 from users.models    import User
-from core.validation import validation
+from core.validation import *
 
 class SignupView(View):
     def post(self, request):
@@ -19,13 +19,11 @@ class SignupView(View):
             mbti     = data.get('mbti', '')
             gender   = data.get('gender', 'Undefined')
 
-            validation(
-                email,
-                password,
-                contact,
-                mbti,
-                gender
-            )
+            email_validation(email)
+            contact_validation(contact)
+            password_validation(password)
+            mbti_validation(mbti)
+            gender_validation(gender)
 
             user = User(
                 name     = name,
@@ -43,27 +41,7 @@ class SignupView(View):
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
         except ValidationError as e:
-            if 'message' in e.__dict__:
-                return JsonResponse({'message': e.message}, status=400)
-
-            e = e.error_dict
-
-            if 'email' in e:
-                msg = 'INVALID_EMAIL'
-            elif 'name' in e:
-                msg = 'INVALID_NAME'
-            elif 'password' in e:
-                msg = 'INVALID_PASSWORD'
-            elif 'contact' in e:
-                msg = 'INVALID_CONTACT'
-            elif 'mbti' in e:
-                msg = 'INVALID_MBTI'
-            elif 'gender' in e:
-                msg = 'INVALID_GENDER'
-            else:
-                msg = 'VALIDATION_ERROR'
-
-            return JsonResponse({'message': msg}, status=400)
+            return JsonResponse({'message': e.messages}, status=400)
 
         return JsonResponse({'message': 'CREATED'}, status=201)
 
