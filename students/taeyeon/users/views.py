@@ -4,27 +4,18 @@ from django.http            import JsonResponse
 from django.views           import View
 from django.core.exceptions import ValidationError
 
+from .validation            import Validation
 from .models                import User
 
 class SignUpView(View) :
-    REGEX_EMAIL    = r'^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    REGEX_PASSWORD = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$'
     
     def post(self, request):
-        
         try: 
             data           = json.loads(request.body)
             email          = data['email']
             password       = data['password']
             
-            if not re.match(self.REGEX_EMAIL, email) :
-                raise ValidationError("Email format is incorrect")
-            
-            if not re.match(self.REGEX_PASSWORD, password) :
-                raise ValidationError("Password format is incorrect")
-            
-            if User.objects.filter(email=email).exists():
-                raise ValidationError("Email already exists")
+            Validation(email,password)
 
             User.objects.create(
                 name     = data['name'],
@@ -44,10 +35,14 @@ class SignUpView(View) :
 class SignInView(View) :
    def post(self, request) :
         try :
-            data = json.loads(request.body)
-           
-            if not User.objects.filter(email=data['email'], password=data['password']).exists() :
+            data     = json.loads(request.body)
+            email    = data['email']
+            password = data['password']
+            if not User.objects.filter(email=email, password=password).exists() :
                 return JsonResponse({"message" : "INVALID_USER"}, status=401)
             return JsonResponse({"message" : "SUCCESS"}, status=200)
+        
+        except User.DoesNotExist :
+            return JsonResponse({"message" : "INVALID_USER"}, status=401)
         except KeyError :
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
