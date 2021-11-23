@@ -19,6 +19,9 @@ class SignUpView(View) :
             Validation_email(email)
             Validation_password(password)
 
+            if User.objects.filter(email=email).exists():
+                raise ValidationError("Email already exists")
+
             User.objects.create(
                 name     = data['name'],
                 email    = data['email'],
