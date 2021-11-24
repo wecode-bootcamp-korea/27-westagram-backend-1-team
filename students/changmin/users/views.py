@@ -29,9 +29,6 @@ class SignUpView(View):
                 phone       = user_phone,
             )
 
-            if decoded_hashed_pw == False:
-                return JsonResponse({'message':'Password is incorrect'}, status=400)
-
             validate_check(
                 user_email,
                 user_password,
