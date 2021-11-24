@@ -18,13 +18,10 @@ class SignUpView(View):
             user_password  = data['password']
             user_phone     = data['phone']
 
-            hased_pw = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
-            decoded_hashed_pw = hased_pw.decode('utf-8')
-
             user_create     = User(
                 name        = user_name,
                 email       = user_email,
-                password    = decoded_hashed_pw,
+                password    = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
                 phone       = user_phone,
             )
 
