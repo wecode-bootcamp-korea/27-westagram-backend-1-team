@@ -2,7 +2,6 @@ import json
 
 from django.views           import View
 from django.http            import JsonResponse
-from django.db              import IntegrityError
 from django.core.exceptions import ValidationError
 
 from users.models           import User
@@ -37,14 +36,12 @@ class SignUpView(View):
         
             return JsonResponse({'message':'SUCCESS'}, status=201)
 
-        except IntegrityError:
-            return JsonResponse({'message':'Duplicated Email exists'}, status=401)
-
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
         except ValidationError as e: 
             return JsonResponse({'message':e.messages}, status=400)
+
 
 class SignInView(View):
     def post(self, request):
@@ -54,7 +51,7 @@ class SignInView(View):
             user_email    = data['email']
             user_password = data['password']
 
-            if not User.objects.filter(email=user_email, password=user_password).exists():
+            if User.objects.filter(email=user_email).exists():
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
             
             return JsonResponse({'message':'SUCCESS'}, status=200)
