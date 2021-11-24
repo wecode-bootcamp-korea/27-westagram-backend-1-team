@@ -23,7 +23,7 @@ class SignUpView(View):
                 user_password,
             )
 
-            decoded_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+            decoded_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
             user_create     = User(
                 name        = user_name,
