@@ -73,7 +73,7 @@ class SigninView(View):
                     password.encode('utf-8'),
                     user.password.encode('utf-8')
             ):
-                raise User.DoesNotExist
+                raise ValidationError('INVALID_PASSWORD')
 
             access_token = jwt.encode(
                 {'user-id': user.id},
@@ -84,6 +84,8 @@ class SigninView(View):
             return JsonResponse({'access_token': access_token}, status=200)
 
         except User.DoesNotExist:
-            return JsonResponse({'message': 'INVALID_USER'}, status=401)
+            return JsonResponse({'message': 'INVALID_EMAIL'}, status=401)
+        except ValidationError as e:
+            return JsonResponse({'message': e.messages}, status=400)
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
