@@ -12,16 +12,15 @@ class SignUpView(View):
 
         data = json.loads(request.body)
 
-        hased_pw = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-        decoded_hashed_pw = hased_pw.decode('utf-8')
-
         try:
-            data           = json.loads(request.body)
             user_name      = data['name']
             user_email     = data['email']
             user_password  = data['password']
             user_phone     = data['phone']
-            
+
+            hased_pw = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
+            decoded_hashed_pw = hased_pw.decode('utf-8')
+
             user_create     = User(
                 name        = user_name,
                 email       = user_email,
@@ -52,10 +51,11 @@ class SignInView(View):
         try:
             data          = json.loads(request.body)
             user_email    = data['email']
+            user_password = data['password']
 
-            if User.objects.filter(email=user_email).exists():
+            if not User.objects.filter(email=user_email, password=user_password).exists():
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
-            
+
             return JsonResponse({'message':'SUCCESS'}, status=200)
 
         except KeyError:
