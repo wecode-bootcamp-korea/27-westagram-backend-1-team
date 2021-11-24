@@ -12,4 +12,3 @@ def validate_email(email):
 def validate_password(password):
     if not re.match(REGEX_PASSWORD, password) :
         raise ValidationError("Password format is incorrect")
-
