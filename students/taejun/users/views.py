@@ -1,11 +1,19 @@
 import json
 
+import bcrypt
+
 from django.views           import View
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 
 from users.models    import User
-from core.validation import *
+from core.validation import (
+    email_validation,
+    contact_validation,
+    password_validation,
+    mbti_validation,
+    gender_validation
+)
 
 class SignupView(View):
     def post(self, request):
@@ -25,10 +33,15 @@ class SignupView(View):
             mbti_validation(mbti)
             gender_validation(gender)
 
+            hashed_password = bcrypt.hashpw(
+                password.encode('utf-8'),
+                bcrypt.gensalt()
+            ).decode('utf-8')
+
             user = User(
                 name     = name,
                 email    = email,
-                password = password,
+                password = hashed_password,
                 contact  = contact,
                 mbti     = mbti,
                 gender   = gender,
@@ -54,10 +67,11 @@ class SigninView(View):
             email    = data['email']
             password = data['password']
 
-            if not User.objects.filter(email=email, password=password).exists():
-                return JsonResponse({'message': 'INVALID_USER'}, status=401)
+            User.objects.get(email=email, password=password)
 
             return JsonResponse({'message': 'SUCCESS'}, status=200)
 
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'INVALID_USER'}, status=401)
         except KeyError:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
