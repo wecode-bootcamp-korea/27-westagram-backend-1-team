@@ -11,6 +11,8 @@ from users.validation       import validate_check
 class SignUpView(View):
     def post(self, request):
 
+        data = json.loads(request.body)
+
         try:
             data           = json.loads(request.body)
             user_name      = data['name']
@@ -18,7 +20,7 @@ class SignUpView(View):
             user_password  = data['password']
             user_phone     = data['phone']
             
-            user_create = User(
+            user_create     = User(
                 name        = user_name,
                 email       = user_email,
                 password    = user_password,
@@ -41,23 +43,20 @@ class SignUpView(View):
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
 
-        except ValidationError: 
-            return JsonResponse({'message':'Validation Error'}, status=400)
+        except ValidationError as e: 
+            return JsonResponse({'message':e.messages}, status=400)
 
 class SignInView(View):
     def post(self, request):
 
         try:
-            data     = json.loads(request.body)
+            data          = json.loads(request.body)
             user_email    = data['email']
             user_password = data['password']
 
-            if user_email == '' or user_password == '':
-                return JsonResponse({'message':'Email or Password must be entered'}, status=401)
-
             if not User.objects.filter(email=user_email, password=user_password).exists():
                 return JsonResponse({'message':'INVALID_USER'}, status=401)
-
+            
             return JsonResponse({'message':'SUCCESS'}, status=200)
 
         except KeyError:
