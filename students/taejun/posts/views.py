@@ -54,7 +54,7 @@ class PostView(View):
             posts.values('id', 'user_name', 'desc', 'image', 'created_at'), posts
         ):
             post['liked_users'] = list(post_query.liked_users.values('id', 'name'))
-            post['comments']    = list(post_query.comment_set.values('user__name', 'content'))
+            post['comments']    = list(post_query.comment_set.annotate(user_name=F('user__name')).values('user_name', 'content'))
 
             results.append(post)
 
@@ -104,9 +104,9 @@ class LikeView(View):
         user = request.user
 
         try:
-            post_id     = data['post_id']
-            post        = Post.objects.prefetch_related('liked_users').get(id=post_id)
-            like        = Like.objects.get_or_create(user=user, post=post)
+            post_id = data['post_id']
+            post    = Post.objects.prefetch_related('liked_users').get(id=post_id)
+            like    = Like.objects.get_or_create(user=user, post=post)
 
             if not like[1]:
                 like[0].delete()
