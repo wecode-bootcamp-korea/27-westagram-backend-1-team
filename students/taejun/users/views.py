@@ -1,19 +1,13 @@
-import json
+import json, re
 
 import bcrypt, jwt
 from django.views           import View
 from django.http            import JsonResponse
 from django.core.exceptions import ValidationError
 
-from users.models    import User
-from my_settings     import SECRET_KEY, ALGORITHM
-from core.validation import (
-    email_validation,
-    contact_validation,
-    password_validation,
-    mbti_validation,
-    gender_validation
-)
+from users.models import User
+from my_settings  import SECRET_KEY, ALGORITHM
+from core.utils   import Validation as V
 
 class SignupView(View):
     def post(self, request):
@@ -27,11 +21,11 @@ class SignupView(View):
             mbti     = data.get('mbti', '')
             gender   = data.get('gender', 'Undefined')
 
-            email_validation(email)
-            contact_validation(contact)
-            password_validation(password)
-            mbti_validation(mbti)
-            gender_validation(gender)
+            V.email_validation(email)
+            V.contact_validation(contact)
+            V.password_validation(password)
+            V.mbti_validation(mbti)
+            V.gender_validation(gender)
 
             hashed_password = bcrypt.hashpw(
                 password.encode('utf-8'),
